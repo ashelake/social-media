@@ -131,7 +131,7 @@ exports.following = async (req, res) => {
 
 exports.updatePassword = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select("+password");
     const { oldPassword, newPassword } = req.body;
 
     isMatch = await user.isMatchPassword(oldPassword);
@@ -181,3 +181,5 @@ exports.updateProfile = async (req, res) => {
     });
   }
 };
+
+
