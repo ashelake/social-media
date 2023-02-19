@@ -1,3 +1,4 @@
+const { findById } = require("../modal/User.model.js");
 const User = require("../modal/User.model.js");
 
 exports.register = async (req, res) => {
@@ -120,6 +121,59 @@ exports.following = async (req, res) => {
         message: "User follwed",
       });
     }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.updatePassword = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const { oldPassword, newPassword } = req.body;
+
+    isMatch = await user.isMatchPassword(oldPassword);
+
+    if (!isMatch) {
+      res.status(400).json({
+        success: false,
+        message: "Old password Missmatch",
+      });
+    }
+    user.password = newPassword;
+    await user.save();
+    res.status(200).json({
+      success: true,
+      message: "Password Changed",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const { name, email } = req.body;
+
+    if (name) {
+      user.name = name;
+    }
+    if (email) {
+      user.email = email;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile Updated",
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
